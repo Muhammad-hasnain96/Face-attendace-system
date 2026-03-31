@@ -142,6 +142,7 @@ input {
                         <th>Name</th>
                         <th>ID</th>
                         <th>Time</th>
+                        <th>Action</th>
                     </tr>
 
                     {% if l %}
@@ -151,6 +152,11 @@ input {
                         <td>{{ names[i] }}</td>
                         <td>{{ rolls[i] }}</td>
                         <td>{{ times[i] }}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger delete-attendance-btn" data-roll="{{ rolls[i] }}">
+                                Delete
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                     {% endif %}
@@ -295,6 +301,26 @@ async function takeAttendance() {
 openCameraBtn.addEventListener('click', openCamera);
 registerBtn.addEventListener('click', registerUser);
 attendanceBtn.addEventListener('click', takeAttendance);
+
+document.addEventListener('click', async (event) => {
+    const button = event.target.closest('.delete-attendance-btn');
+    if (!button) return;
+    const roll = button.dataset.roll;
+    if (!roll) return;
+    if (!confirm('Delete this attendance record?')) return;
+    const response = await fetch('/delete_attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roll })
+    });
+    const result = await response.json();
+    if (result.success) {
+        setStatus(result.message);
+        setTimeout(() => window.location.reload(), 800);
+    } else {
+        setStatus(result.message, true);
+    }
+});
 </script>
 
 </body>
