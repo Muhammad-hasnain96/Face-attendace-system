@@ -4,4 +4,4 @@ pandas==2.3.3
 scikit-learn==1.7.2
 joblib==1.5.3
 opencv-python==4.13.0.92
-gunicorn==22.1.0
+gunicorn==25.3.0
