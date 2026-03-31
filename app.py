@@ -156,6 +156,18 @@ def add_attendance(name):
         with open(csv_path, 'a') as f:
             f.write(f'\n{username},{userid},{current_time}')
 
+
+def remove_attendance(roll):
+    csv_path = ensure_attendance_file()
+    df = pd.read_csv(csv_path)
+    roll = str(roll)
+    if roll not in df['Roll'].astype(str).tolist():
+        return False
+    df = df[df['Roll'].astype(str) != roll]
+    df.to_csv(csv_path, index=False)
+    return True
+
+
 def getallusers():
     userlist = os.listdir('static/faces')
     names = []
@@ -232,6 +244,17 @@ def recognize():
 
     add_attendance(identified_person)
     return jsonify(success=True, message=f'Attendance marked for {identified_person}.')
+
+
+@app.route('/delete_attendance', methods=['POST'])
+def delete_attendance():
+    data = request.get_json(force=True)
+    roll = data.get('roll', '')
+    if not roll:
+        return jsonify(success=False, message='Attendance ID is required.')
+    if remove_attendance(roll):
+        return jsonify(success=True, message='Attendance record deleted.')
+    return jsonify(success=False, message='Attendance record not found.')
 
 
 @app.route('/start', methods=['GET'])
